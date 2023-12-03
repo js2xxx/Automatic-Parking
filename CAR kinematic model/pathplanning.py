@@ -279,7 +279,7 @@ class ParkPathPlanning:
         path = path[::-1]
         computed_angle = angle_of_line(path[-10][0],path[-10][1],path[-1][0],path[-1][1])
 
-        s = 4
+        s = 2
         l = 8
         d = 2
         w = 4
@@ -289,7 +289,7 @@ class ParkPathPlanning:
             y_ensure2 = gy
             x_ensure1 = x_ensure2 + d + w
             y_ensure1 = y_ensure2 - l - s
-            ensure_path1 = np.vstack([np.repeat(x_ensure1,3/0.25), np.arange(y_ensure1-3,y_ensure1,0.25)[::-1]]).T
+            ensure_path1 = np.vstack([np.arange(x_ensure1-3,x_ensure1,0.25), np.repeat(y_ensure1,3/0.25)]).T
             ensure_path2 = np.vstack([np.repeat(x_ensure2,3/0.25), np.arange(y_ensure2,y_ensure2+3,0.25)[::-1]]).T
             park_path = self.plan_park_down_right(x_ensure2, y_ensure2)
 
@@ -298,7 +298,7 @@ class ParkPathPlanning:
             y_ensure2 = gy
             x_ensure1 = x_ensure2 - d - w
             y_ensure1 = y_ensure2 - l - s 
-            ensure_path1 = np.vstack([np.repeat(x_ensure1,3/0.25), np.arange(y_ensure1-3,y_ensure1,0.25)[::-1]]).T
+            ensure_path1 = np.vstack([np.arange(x_ensure1+3,x_ensure1,0.25), np.repeat(y_ensure1,3/0.25)]).T
             ensure_path2 = np.vstack([np.repeat(x_ensure2,3/0.25), np.arange(y_ensure2,y_ensure2+3,0.25)[::-1]]).T
             park_path = self.plan_park_down_left(x_ensure2, y_ensure2)
 
@@ -307,7 +307,7 @@ class ParkPathPlanning:
             y_ensure2 = gy
             x_ensure1 = x_ensure2 - d - w
             y_ensure1 = y_ensure2 + l + s
-            ensure_path1 = np.vstack([np.repeat(x_ensure1,3/0.25), np.arange(y_ensure1,y_ensure1+3,0.25)]).T
+            ensure_path1 = np.vstack([np.arange(x_ensure1+3,x_ensure1,0.25), np.repeat(y_ensure1,3/0.25)]).T
             ensure_path2 = np.vstack([np.repeat(x_ensure2,3/0.25), np.arange(y_ensure2-3,y_ensure2,0.25)]).T
             park_path = self.plan_park_up_left(x_ensure2, y_ensure2)
 
@@ -316,7 +316,7 @@ class ParkPathPlanning:
             y_ensure2 = gy
             x_ensure1 = x_ensure2 + d + w
             y_ensure1 = y_ensure2 + l + s
-            ensure_path1 = np.vstack([np.repeat(x_ensure1,3/0.25), np.arange(y_ensure1,y_ensure1+3,0.25)]).T
+            ensure_path1 = np.vstack([np.arange(x_ensure1-3,x_ensure1,0.25), np.repeat(y_ensure1,3/0.25)]).T
             ensure_path2 = np.vstack([np.repeat(x_ensure2,3/0.25), np.arange(y_ensure2-3,y_ensure2,0.25)]).T
             park_path = self.plan_park_up_right(x_ensure2, y_ensure2)
 
@@ -324,7 +324,7 @@ class ParkPathPlanning:
 
 
     def plan_park_up_right(self, x1, y1):       
-            s = 4
+            s = 2
             l = 8
             d = 2
             w = 4
@@ -359,7 +359,7 @@ class ParkPathPlanning:
             return park_path
 
     def plan_park_up_left(self, x1, y1):       
-            s = 4
+            s = 2
             l = 8
             d = 2
             w = 4
@@ -395,7 +395,7 @@ class ParkPathPlanning:
 
 
     def plan_park_down_right(self, x1,y1):
-            s = 4
+            s = 2
             l = 8
             d = 2
             w = 4
@@ -432,7 +432,7 @@ class ParkPathPlanning:
 
 
     def plan_park_down_left(self, x1,y1):
-            s = 4
+            s = 2
             l = 8
             d = 2
             w = 4
