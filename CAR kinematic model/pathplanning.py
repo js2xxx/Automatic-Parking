@@ -245,8 +245,8 @@ class PathPlanning:
 
     def plan_path(self,sx, sy, gx, gy):    
         rx, ry = self.a_star.planning(sx+self.margin, sy+self.margin, gx+self.margin, gy+self.margin)
-        rx = np.array(rx)-self.margin+0.5
-        ry = np.array(ry)-self.margin+0.5
+        rx = np.array(rx)-self.margin
+        ry = np.array(ry)-self.margin
         path = np.vstack([rx,ry]).T
         return path[::-1]
 
@@ -276,12 +276,13 @@ class ParkPathPlanning:
         rx = np.array(rx)-self.margin+0.5
         ry = np.array(ry)-self.margin+0.5
         path = np.vstack([rx,ry]).T
-        path = path[::-1]
-        computed_angle = angle_of_line(path[-10][0],path[-10][1],path[-1][0],path[-1][1])
+        computed_angle = math.atan2(path[10][1]-path[1][1],path[10][0]-path[1][0])
 
-        s = 2
+        path = path[::-1]
+
+        s = 0
         l = 8
-        d = 2
+        d = 4
         w = 4
 
         if -math.atan2(0,-1) < computed_angle <= math.atan2(-1,0):
@@ -289,7 +290,7 @@ class ParkPathPlanning:
             y_ensure2 = gy
             x_ensure1 = x_ensure2 + d + w
             y_ensure1 = y_ensure2 - l - s
-            ensure_path1 = np.vstack([np.arange(x_ensure1-3,x_ensure1,0.25), np.repeat(y_ensure1,3/0.25)]).T
+            ensure_path1 = np.vstack([np.arange(x_ensure1,x_ensure1+3,0.25), np.repeat(y_ensure1,3/0.25)]).T
             ensure_path2 = np.vstack([np.repeat(x_ensure2,3/0.25), np.arange(y_ensure2,y_ensure2+3,0.25)[::-1]]).T
             park_path = self.plan_park_down_right(x_ensure2, y_ensure2)
 
@@ -298,7 +299,7 @@ class ParkPathPlanning:
             y_ensure2 = gy
             x_ensure1 = x_ensure2 - d - w
             y_ensure1 = y_ensure2 - l - s 
-            ensure_path1 = np.vstack([np.arange(x_ensure1+3,x_ensure1,0.25), np.repeat(y_ensure1,3/0.25)]).T
+            ensure_path1 = np.vstack([np.arange(x_ensure1-3,x_ensure1,0.25)[::-1], np.repeat(y_ensure1,3/0.25)]).T
             ensure_path2 = np.vstack([np.repeat(x_ensure2,3/0.25), np.arange(y_ensure2,y_ensure2+3,0.25)[::-1]]).T
             park_path = self.plan_park_down_left(x_ensure2, y_ensure2)
 
@@ -307,7 +308,7 @@ class ParkPathPlanning:
             y_ensure2 = gy
             x_ensure1 = x_ensure2 - d - w
             y_ensure1 = y_ensure2 + l + s
-            ensure_path1 = np.vstack([np.arange(x_ensure1+3,x_ensure1,0.25), np.repeat(y_ensure1,3/0.25)]).T
+            ensure_path1 = np.vstack([np.arange(x_ensure1-3,x_ensure1,0.25)[::-1], np.repeat(y_ensure1,3/0.25)]).T
             ensure_path2 = np.vstack([np.repeat(x_ensure2,3/0.25), np.arange(y_ensure2-3,y_ensure2,0.25)]).T
             park_path = self.plan_park_up_left(x_ensure2, y_ensure2)
 
@@ -316,7 +317,7 @@ class ParkPathPlanning:
             y_ensure2 = gy
             x_ensure1 = x_ensure2 + d + w
             y_ensure1 = y_ensure2 + l + s
-            ensure_path1 = np.vstack([np.arange(x_ensure1-3,x_ensure1,0.25), np.repeat(y_ensure1,3/0.25)]).T
+            ensure_path1 = np.vstack([np.arange(x_ensure1,x_ensure1+3,0.25), np.repeat(y_ensure1,3/0.25)]).T
             ensure_path2 = np.vstack([np.repeat(x_ensure2,3/0.25), np.arange(y_ensure2-3,y_ensure2,0.25)]).T
             park_path = self.plan_park_up_right(x_ensure2, y_ensure2)
 
@@ -324,9 +325,9 @@ class ParkPathPlanning:
 
 
     def plan_park_up_right(self, x1, y1):       
-            s = 2
+            s = 0
             l = 8
-            d = 2
+            d = 4
             w = 4
 
             x0 = x1 + d + w
@@ -334,34 +335,30 @@ class ParkPathPlanning:
             
             curve_x = np.array([])
             curve_y = np.array([])
-            y = np.arange(y1,y0+1)
-            circle_fun = (6.9**2 - (y-y0)**2)
-            x = (np.sqrt(circle_fun[circle_fun>=0]) + x0-6.9)
-            y = y[circle_fun>=0]
-            choices = x>x0-6.9/2
-            x=x[choices]
-            y=y[choices]
-            curve_x = np.append(curve_x, x[::-1])
-            curve_y = np.append(curve_y, y[::-1])
-            
-            y = np.arange(y1,y0+1)
-            circle_fun = (6.9**2 - (y-y1)**2)
-            x = (np.sqrt(circle_fun[circle_fun>=0]) + x1+6.9)
-            y = y[circle_fun>=0]
-            x = (x - 2*(x-(x1+6.9)))
-            choices = x<x1+6.9/2
-            x=x[choices]
-            y=y[choices]
-            curve_x = np.append(curve_x, x[::-1])
-            curve_y = np.append(curve_y, y[::-1])
+
+            x = np.arange(x0-2,x0)[::-1]
+            y = np.repeat(y0,len(x))
+            curve_x = np.append(curve_x,x)
+            curve_y = np.append(curve_y,y)
+
+            x = np.arange(x1,x0-2)[::-1]
+            cf = 6**2 - (x-x0+2)**2
+            y = np.sqrt(cf[cf>=0]) + y0-6
+            curve_x = np.append(curve_x,x)
+            curve_y = np.append(curve_y,y)
+
+            y = np.arange(y1,y1+2)[::-1]
+            x = np.repeat(x1,len(y))
+            curve_x = np.append(curve_x,x)
+            curve_y = np.append(curve_y,y)
 
             park_path = np.vstack([curve_x, curve_y]).T
             return park_path
 
     def plan_park_up_left(self, x1, y1):       
-            s = 2
+            s = 0
             l = 8
-            d = 2
+            d = 4
             w = 4
 
             x0 = x1 - d - w
@@ -369,35 +366,31 @@ class ParkPathPlanning:
             
             curve_x = np.array([])
             curve_y = np.array([])
-            y = np.arange(y1,y0+1)
-            circle_fun = (6.9**2 - (y-y0)**2)
-            x = (np.sqrt(circle_fun[circle_fun>=0]) + x0+6.9)
-            y = y[circle_fun>=0]
-            x = (x - 2*(x-(x0+6.9)))
-            choices = x<x0+6.9/2
-            x=x[choices]
-            y=y[choices]
-            curve_x = np.append(curve_x, x[::-1])
-            curve_y = np.append(curve_y, y[::-1])
-            
-            y = np.arange(y1,y0+1)
-            circle_fun = (6.9**2 - (y-y1)**2)
-            x = (np.sqrt(circle_fun[circle_fun>=0]) + x1-6.9)
-            y = y[circle_fun>=0]
-            choices = x>x1-6.9/2
-            x=x[choices]
-            y=y[choices]
-            curve_x = np.append(curve_x, x[::-1])
-            curve_y = np.append(curve_y, y[::-1])
+
+            x = np.arange(x0,x0+2)
+            y = np.repeat(y0,len(x))
+            curve_x = np.append(curve_x,x)
+            curve_y = np.append(curve_y,y)
+
+            x = np.arange(x0+2,x1)
+            cf = 6**2 - (x-x0-2)**2
+            y = np.sqrt(cf[cf>=0]) + y0-6
+            curve_x = np.append(curve_x,x)
+            curve_y = np.append(curve_y,y)
+
+            y = np.arange(y1,y1+2)[::-1]
+            x = np.repeat(x1,len(y))
+            curve_x = np.append(curve_x,x)
+            curve_y = np.append(curve_y,y)
 
             park_path = np.vstack([curve_x, curve_y]).T
             return park_path
 
 
     def plan_park_down_right(self, x1,y1):
-            s = 2
+            s = 0
             l = 8
-            d = 2
+            d = 4
             w = 4
 
             x0 = x1 + d + w
@@ -405,36 +398,31 @@ class ParkPathPlanning:
             
             curve_x = np.array([])
             curve_y = np.array([])
-            y = np.arange(y0,y1+1)
-            circle_fun = (6.9**2 - (y-y0)**2)
-            x = (np.sqrt(circle_fun[circle_fun>=0]) + x0-6.9)
-            y = y[circle_fun>=0]
-            choices = x>x0-6.9/2
-            x=x[choices]
-            y=y[choices]
-            
-            curve_x = np.append(curve_x, x)
-            curve_y = np.append(curve_y, y)
-            
-            y = np.arange(y0,y1+1)
-            circle_fun = (6.9**2 - (y-y1)**2)
-            x = (np.sqrt(circle_fun[circle_fun>=0]) + x1+6.9)
-            x = (x - 2*(x-(x1+6.9)))
-            y = y[circle_fun>=0]
-            choices = x<x1+6.9/2
-            x=x[choices]
-            y=y[choices]
-            curve_x = np.append(curve_x, x)
-            curve_y = np.append(curve_y, y)
+
+            x = np.arange(x0-2,x0)[::-1]
+            y = np.repeat(y0,len(x))
+            curve_x = np.append(curve_x,x)
+            curve_y = np.append(curve_y,y)
+
+            x = np.arange(x1,x0-2)[::-1]
+            cf = 6**2 - (x-x0+2)**2
+            y = -np.sqrt(cf[cf>=0]) + y0+6
+            curve_x = np.append(curve_x,x)
+            curve_y = np.append(curve_y,y)
+
+            y = np.arange(y1-2,y1)
+            x = np.repeat(x1,len(y))
+            curve_x = np.append(curve_x,x)
+            curve_y = np.append(curve_y,y)
             
             park_path = np.vstack([curve_x, curve_y]).T
             return park_path
 
 
     def plan_park_down_left(self, x1,y1):
-            s = 2
+            s = 0
             l = 8
-            d = 2
+            d = 4
             w = 4
 
             x0 = x1 - d - w
@@ -442,26 +430,25 @@ class ParkPathPlanning:
             
             curve_x = np.array([])
             curve_y = np.array([])
-            y = np.arange(y0,y1+1)
-            circle_fun = (6.9**2 - (y-y0)**2)
-            x = (np.sqrt(circle_fun[circle_fun>=0]) + x0+6.9)
-            y = y[circle_fun>=0]
-            x = (x - 2*(x-(x0+6.9)))
-            choices = x<x0+6.9/2
-            x=x[choices]
-            y=y[choices]
-            curve_x = np.append(curve_x, x)
-            curve_y = np.append(curve_y, y)
-            
-            y = np.arange(y0,y1+1)
-            circle_fun = (6.9**2 - (y-y1)**2)
-            x = (np.sqrt(circle_fun[circle_fun>=0]) + x1-6.9)
-            y = y[circle_fun>=0]
-            choices = x>x1-6.9/2
-            x=x[choices]
-            y=y[choices]
-            curve_x = np.append(curve_x, x)
-            curve_y = np.append(curve_y, y)
+
+            x = np.arange(x0,x0+2)
+            y = np.repeat(y0,len(x))
+            print(x, y)
+            curve_x = np.append(curve_x,x)
+            curve_y = np.append(curve_y,y)
+
+            x = np.arange(x0+2,x1)
+            cf = 6**2 - (x-x0-2)**2
+            y = -np.sqrt(cf[cf>=0]) + y0+6
+            print(x, y)
+            curve_x = np.append(curve_x,x)
+            curve_y = np.append(curve_y,y)
+
+            y = np.arange(y1-2,y1)
+            x = np.repeat(x1,len(y))
+            print(x, y)
+            curve_x = np.append(curve_x,x)
+            curve_y = np.append(curve_y,y)
             
             park_path = np.vstack([curve_x, curve_y]).T
             return park_path
