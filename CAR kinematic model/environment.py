@@ -89,22 +89,36 @@ class Environment:
 
 
 class Parking1:
-    def __init__(self, car_pos):
+    def __init__(self, x, y):
         self.car_obstacle = self.make_car()
         # self.walls = [[70,i] for i in range(-5,90) ]+\
         #              [[30,i] for i in range(10,105)]+\
         #              [[i,10] for i in range(30,36) ]+\
         #              [[i,90] for i in range(70,76) ] #+ [[i,20] for i in range(-5,50)]
-        # self.walls = []
-        self.walls = [0,100]
+        self.walls = [[37, i] for i in range(66, 84)]+ \
+                     [[37, i] for i in range(38, 56)]+\
+                     [[86, i] for i in range(66, 84)] + \
+                     [[86, i] for i in range(38, 56)]
         self.obs = np.array(self.walls)
-        self.cars = {1 : [[65,80]], 2: [[71,80]]}
+        self.cars = {1: [[41, 80]], 2: [[47, 80]], 3: [[53, 80]], 4: [[59, 80]],5: [[65, 80]], 6: [[71, 80]], 7: [[77, 80]], 8: [[83, 80]],
+                     9: [[41, 70]], 10: [[47, 70]], 11: [[53, 70]], 12: [[59, 70]],13: [[65, 70]], 14: [[71, 70]], 15: [[77, 70]], 16: [[83, 70]],
+                     17: [[41, 52]], 18: [[47, 52]], 19: [[53, 52]], 20: [[59, 52]], 21: [[65, 52]], 22: [[71, 52]],23: [[77, 52]], 24: [[83, 52]],
+                     25: [[41, 42]], 26: [[47, 42]], 27: [[53, 42]], 28: [[59, 42]], 29: [[65, 42]], 30: [[71, 42]],31: [[77, 42]], 32: [[83, 42]],
+                     }
+        self.empty_pos = [7,3,4,14,28]
+        costs = []
+        for i in self.empty_pos:
+            cost = abs(x-self.cars[i][0][0]) + abs(y-self.cars[i][0][1])
+            costs.append(cost)
+        print(costs.index(min(costs)))
+        car_pos = self.empty_pos[costs.index(min(costs))]
         self.end = self.cars[car_pos][0]
+        print(self.end[0])
         self.cars.pop(car_pos)
 
     def generate_obstacles(self):
         for i in self.cars.keys():
-            for j in range(len(self.cars[i])):
+              for j in range(len(self.cars[i])):
                 obstacle = self.car_obstacle + self.cars[i]
                 self.obs = np.append(self.obs, obstacle)
         return self.end, np.array(self.obs).reshape(-1,2)
