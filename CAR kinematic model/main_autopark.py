@@ -16,7 +16,7 @@ from utils import angle_of_line, make_square, DataLogger
 # 3. wall_endpoints: np array, [[[x_start1, y_start1],[x_end1, y_end1]], [[x_start2, y_start2],[x_end2, y_end2]], ... ], the wall should be horizontal ot vertical
 # 4. start_point: np array, [x_start, y_start] of the edo vehicle's initial state
 # 5. figure_size: the width and height of the hole figure, np array, [length, width]
-# 6. car_size: the length and width of the carport, np array, [width, height]
+# 6. car_size: the width and height of the car, np array, [width, height]
 
 def set_up_map(car_points, empty_index, wall_endpoints, start_point, fig_size, car_size):
     # defining obstacles

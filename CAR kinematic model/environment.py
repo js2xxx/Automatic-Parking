@@ -7,9 +7,11 @@ class Environment:
         #coordinates are in [x,y] format
         self.car_length = car_length
         self.car_width = car_width
-        self.wheel_length = 3/16*car_length
-        self.wheel_width = 7/80*car_length
-        self.wheel_positions = np.array([[5/16*car_length,3/16*car_length],[5/16*car_length,-3/16*car_length],[-5/16*car_length,3/16*car_length],[-5/16*car_length,-3/16*car_length]])
+        self.wheel_length = round(3.0/16*car_length)
+        self.wheel_width = round(7.0/80*car_length)
+        wheel_pos_x=round(5.0/16*car_length)
+        wheel_pos_y=round(3.0/16*car_length)
+        self.wheel_positions = np.array([[wheel_pos_x,wheel_pos_y],[wheel_pos_x,-wheel_pos_y],[-wheel_pos_x,wheel_pos_y],[-wheel_pos_x,-wheel_pos_y]])
         
         self.color = np.array([0,0,255])/255
         self.wheel_color = np.array([20,20,20])/255
