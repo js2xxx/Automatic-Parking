@@ -8,6 +8,50 @@ from pathplanning import PathPlanning, ParkPathPlanning, interpolate_path
 from control import Car_Dynamics, MPC_Controller, Linear_MPC_Controller
 from utils import angle_of_line, make_square, DataLogger
 
+
+# Data port for detection result
+# bound_marking_points, car_points, wall_endpoints should be np array, and x_start, y_start are integers
+# 1. car_points: dictionary, {1: [[41, 80]], 2: [[47, 80]], 3: [[53, 80]],..., n: [[XX, XX]]]
+# 2. empty_index: list, key of empty carport
+# 3. wall_endpoints: np array, [[[x_start1, y_start1],[x_end1, y_end1]], [[x_start2, y_start2],[x_end2, y_end2]], ... ], the wall should be horizontal ot vertical
+# 4. start_point: np array, [x_start, y_start] of the edo vehicle's initial state
+# 5. figure_size: the width and height of the hole figure, np array, [length, width]
+# 6. car_size: the length and width of the carport
+
+def set_up_map(car_points, empty_index, wall_endpoints, start_point, fig_size, car_size):
+    # defining obstacles
+    parking1 = Parking1(start_point[0],start_point[1])
+    parking1.cars = car_points
+    for wall in wall_endpoints:
+        if wall[0,0] == wall[1,0]:
+            if parking1.walls == None:
+                parking1.walls = [[ wall[0,0], i] for i in range(wall[0,1], wall[1,1])]
+            else:
+                parking1.walls = parking1.walls+[[ wall[0,0], i] for i in range(wall[0,1], wall[1,1])]
+        if wall[0,1] == wall[1,1]:
+            if parking1.walls == None:
+                parking1.walls = [[ i, wall[0,1]] for i in range(wall[0,0], wall[1,0])]
+            else:
+                parking1.walls = parking1.walls+[[ i, wall[0,1]] for i in range(wall[0,0], wall[1,0])] 
+    parking1.obs = np.array(parking1.walls)
+    parking1.empty_pos = empty_index
+    costs = []
+    for i in empty_index:
+        cost = abs(parking1.x-parking1.cars[i][0][0]) + abs(parking1.y-parking1.cars[i][0][1])
+        costs.append(cost)
+    car_pos = parking1.empty_pos[costs.index(min(costs))]
+    parking1.end = parking1.cars[car_pos][0]
+    parking1.cars.pop(car_pos)    
+    end, obs = parking1.generate_obstacles()
+    
+    # setup environment
+    env = Environment(obs, width=fig_size[0], height=fig_size[1], car_length = 80, car_width = 40)
+    
+    return obs, env, end
+    
+    
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--x_start', type=int, default=0, help='X of start')
@@ -27,32 +71,21 @@ if __name__ == '__main__':
     # environment margin  : 5
     # pathplanning margin : 5
 
-    ########################## defining obstacles ###############################################
+    
+    ########################### initialization ##################################################
+    
+    # Uncomment for inputing detection data
+    # obs, env, end = set_up_map(car_points, wall_endpoints, start_point, fig_size, car_size)
+    
+    # Comment the following 3 lines for inputing detection data
     parking1 = Parking1(args.x_start,args.y_start)
     end, obs = parking1.generate_obstacles()
-
-    # add squares
-    # square1 = make_square(10,65,20)
-    # square2 = make_square(15,30,20)
-    # square3 = make_square(50,50,10)
-    # obs = np.vstack([obs,square1,square2,square3])
-
-    # Rahneshan logo
-    # start = np.array([50,5])
-    # end = np.array([35,67])
-    # rah = np.flip(cv2.imread('READ_ME/rahneshan_obstacle.png',0), axis=0)
-    # obs = np.vstack([np.where(rah<100)[1],np.where(rah<100)[0]]).T
-
-    # new_obs = np.array([[78,78],[79,79],[78,79]])
-    # obs = np.vstack([obs,new_obs])
-    #############################################################################################
-
-    ########################### initialization ##################################################
     env = Environment(obs)
+    
     my_car = Car_Dynamics(start[0], start[1], 0, np.deg2rad(args.psi_start), length=4, dt=0.2)
     MPC_HORIZON = 5
     controller = MPC_Controller()
-    # controller = Linear_MPC_Controller()
+    # controllerc = Linear_MPC_Controller()
 
     res = env.render(my_car.x, my_car.y, my_car.psi, 0)
     cv2.imshow('environment', res)

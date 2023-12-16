@@ -2,14 +2,14 @@ import cv2
 import numpy as np
 
 class Environment:
-    def __init__(self,obstacles):
+    def __init__(self,obstacles, width=1000, height=1000,car_length = 80, car_width = 40):
         self.margin = 5
         #coordinates are in [x,y] format
-        self.car_length = 80
-        self.car_width = 40
-        self.wheel_length = 15
-        self.wheel_width = 7
-        self.wheel_positions = np.array([[25,15],[25,-15],[-25,15],[-25,-15]])
+        self.car_length = car_length
+        self.car_width = car_width
+        self.wheel_length = 3/16*car_length
+        self.wheel_width = 7/80*car_length
+        self.wheel_positions = np.array([[5/16*car_length,3/16*car_length],[5/16*car_length,-3/16*car_length],[-5/16*car_length,3/16*car_length],[-5/16*car_length,-3/16*car_length]])
         
         self.color = np.array([0,0,255])/255
         self.wheel_color = np.array([20,20,20])/255
@@ -27,9 +27,9 @@ class Environment:
                                       np.int32)
 
         #height and width
-        self.background = np.ones((1000+20*self.margin,1000+20*self.margin,3))
-        self.background[10:1000+20*self.margin:10,:] = np.array([200,200,200])/255
-        self.background[:,10:1000+20*self.margin:10] = np.array([200,200,200])/255
+        self.background = np.ones((width+20*self.margin,height+20*self.margin,3))
+        self.background[10:width+20*self.margin:10,:] = np.array([200,200,200])/255
+        self.background[:,10:height+20*self.margin:10] = np.array([200,200,200])/255
         self.place_obstacles(obstacles)
                 
     def place_obstacles(self, obs):
@@ -91,30 +91,30 @@ class Environment:
 class Parking1:
     def __init__(self, x, y):
         self.car_obstacle = self.make_car()
-        # self.walls = [[70,i] for i in range(-5,90) ]+\
-        #              [[30,i] for i in range(10,105)]+\
-        #              [[i,10] for i in range(30,36) ]+\
-        #              [[i,90] for i in range(70,76) ] #+ [[i,20] for i in range(-5,50)]
-        self.walls = [[37, i] for i in range(66, 84)]+ \
-                     [[37, i] for i in range(38, 56)]+\
-                     [[86, i] for i in range(66, 84)] + \
-                     [[86, i] for i in range(38, 56)]
-        self.obs = np.array(self.walls)
-        self.cars = {1: [[41, 80]], 2: [[47, 80]], 3: [[53, 80]], 4: [[59, 80]],5: [[65, 80]], 6: [[71, 80]], 7: [[77, 80]], 8: [[83, 80]],
-                     9: [[41, 70]], 10: [[47, 70]], 11: [[53, 70]], 12: [[59, 70]],13: [[65, 70]], 14: [[71, 70]], 15: [[77, 70]], 16: [[83, 70]],
-                     17: [[41, 52]], 18: [[47, 52]], 19: [[53, 52]], 20: [[59, 52]], 21: [[65, 52]], 22: [[71, 52]],23: [[77, 52]], 24: [[83, 52]],
-                     25: [[41, 42]], 26: [[47, 42]], 27: [[53, 42]], 28: [[59, 42]], 29: [[65, 42]], 30: [[71, 42]],31: [[77, 42]], 32: [[83, 42]],
-                     }
-        self.empty_pos = [7,3,4,14,28]
-        costs = []
-        for i in self.empty_pos:
-            cost = abs(x-self.cars[i][0][0]) + abs(y-self.cars[i][0][1])
-            costs.append(cost)
-        print(costs.index(min(costs)))
-        car_pos = self.empty_pos[costs.index(min(costs))]
-        self.end = self.cars[car_pos][0]
-        print(self.end[0])
-        self.cars.pop(car_pos)
+        # self.walls = [[37, i] for i in range(66, 84)]+ \
+        #              [[37, i] for i in range(38, 56)]+\
+        #              [[86, i] for i in range(66, 84)] + \
+        #              [[86, i] for i in range(38, 56)]
+        # self.obs = np.array(self.walls)
+        # self.cars = {1: [[41, 80]], 2: [[47, 80]], 3: [[53, 80]], 4: [[59, 80]],5: [[65, 80]], 6: [[71, 80]], 7: [[77, 80]], 8: [[83, 80]],
+        #              9: [[41, 70]], 10: [[47, 70]], 11: [[53, 70]], 12: [[59, 70]],13: [[65, 70]], 14: [[71, 70]], 15: [[77, 70]], 16: [[83, 70]],
+        #              17: [[41, 52]], 18: [[47, 52]], 19: [[53, 52]], 20: [[59, 52]], 21: [[65, 52]], 22: [[71, 52]],23: [[77, 52]], 24: [[83, 52]],
+        #              25: [[41, 42]], 26: [[47, 42]], 27: [[53, 42]], 28: [[59, 42]], 29: [[65, 42]], 30: [[71, 42]],31: [[77, 42]], 32: [[83, 42]],
+        #              }
+        # self.empty_pos = [7,3,4,14,28]
+        # costs = []
+        # for i in self.empty_pos:
+        #     cost = abs(x-self.cars[i][0][0]) + abs(y-self.cars[i][0][1])
+        #     costs.append(cost)
+        # print(costs.index(min(costs)))
+        # car_pos = self.empty_pos[costs.index(min(costs))]
+        # self.end = self.cars[car_pos][0]
+        # print(self.end[0])
+        # self.cars.pop(car_pos)
+        self.walls=None
+        self.obs=None
+        self.cars=None
+        self.empty_pos=None
 
     def generate_obstacles(self):
         for i in self.cars.keys():
