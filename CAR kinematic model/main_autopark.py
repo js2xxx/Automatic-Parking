@@ -7,6 +7,11 @@ from environment import Environment, Parking1
 from pathplanning import PathPlanning, ParkPathPlanning, interpolate_path
 from control import Car_Dynamics, MPC_Controller, Linear_MPC_Controller
 from utils import angle_of_line, make_square, DataLogger
+from spot_detector.spot_detector import Spot_detector
+
+
+detector = Spot_detector()
+ret = detector.run()
 
 
 # Data port for detection result

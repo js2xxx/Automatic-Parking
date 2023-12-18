@@ -34,11 +34,13 @@ class Environment:
         self.background[:,10:height+20*self.margin:10] = np.array([200,200,200])/255
         self.place_obstacles(obstacles)
                 
-    def place_obstacles(self, obs):
-        obstacles = np.concatenate([np.array([[0,i] for i in range(100+2*self.margin)]),
-                                    np.array([[100+2*self.margin-1,i] for i in range(100+2*self.margin)]),
-                                    np.array([[i,0] for i in range(100+2*self.margin)]),
-                                    np.array([[i,100+2*self.margin-1] for i in range(100+2*self.margin)]),
+    def place_obstacles(self, obs, width, height):
+        meshed_width=round(width/10)
+        meshed_height=round(height/10)
+        obstacles = np.concatenate([np.array([[0,i] for i in range(meshed_height+2*self.margin)]),
+                                    np.array([[meshed_width+2*self.margin-1,i] for i in range(meshed_width+2*self.margin)]),
+                                    np.array([[i,0] for i in range(meshed_height+2*self.margin)]),
+                                    np.array([[i,meshed_width+2*self.margin-1] for i in range(meshed_width+2*self.margin)]),
                                     obs + np.array([self.margin,self.margin])])*10
         for ob in obstacles:
             self.background[ob[1]:ob[1]+10,ob[0]:ob[0]+10]=0
